@@ -10,6 +10,6 @@ namespace DotNet6AdressesAPI.Data
 
         }
 
-        public DbSet<Address> Address => Set<Address>();
+        public DbSet<Address> Addresses { get; set; }
     }
 }
