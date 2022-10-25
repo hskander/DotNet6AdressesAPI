@@ -83,46 +83,54 @@ namespace DotNet6AdressesAPI.Controllers
             return Ok(newAddress);
         }
 
-        [HttpGet("/GetAllAscending")]
-        public async Task<ActionResult<List<Address>>> GetAllAscending()
+        [HttpGet("/Sort/{AscOrDesc}")]
+        public async Task<ActionResult<List<Address>>> GetAllAscending(string AscOrDesc)
         {
-            try
+            if(AscOrDesc == "Desc")
             {
-                return Ok(await this._appDbContext.Addresses.OrderBy(a => a.HouseNumber).ToListAsync());    
-            }catch(Exception ex)
-            {
-                return BadRequest("Bad Request");
+                try
+                {
+                    return Ok(await this._appDbContext.Addresses.OrderByDescending(a => a.HouseNumber).ToListAsync());
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest("Bad Request");
+                }
             }
-        }
-        [HttpGet("/GetAllDescending")]
-        public async Task<ActionResult<List<Address>>> GetAllDescending()
-        {
             try
             {
-                return Ok(await this._appDbContext.Addresses.OrderByDescending(a => a.HouseNumber).ToListAsync());
+                return Ok(await this._appDbContext.Addresses.OrderBy(a => a.HouseNumber).ToListAsync());
             }
             catch (Exception ex)
             {
                 return BadRequest("Bad Request");
             }
+
         }
+
+        /*[HttpGet("test")]
+        public async Task<ActionResult<List<Address>>> getTest()
+        {
+            Address a=new Address();
+            return Ok( a.GetType().GetProperties().ToList() ) ;
+        }*/
 
         [HttpGet("/Search/{value}")]
         public async Task<ActionResult<List<Address>>> Search(string value)
         {
-            try
-            {
-                return Ok(await this._appDbContext.Addresses.Where(a => a.HouseNumber.ToString().ToLower().Contains(value.ToLower())
-                                                                 ||a.Id.ToString().ToLower().Contains(value.ToLower())
-                                                                 ||a.ZipCode.ToString().ToLower().Contains(value.ToLower())
-                                                                 ||a.Country.ToLower().Contains(value.ToLower())
-                                                                 ||a.City.ToLower().Contains(value.ToLower())
-                                                                 ||a.Street.ToLower().Contains(value.ToLower())).ToListAsync());
-            }
-            catch (Exception ex)
-            {
-                return BadRequest("Bad Request");
-            }
+           
+                 return Ok(await this._appDbContext.Addresses.Where(a => a.HouseNumber.ToString().ToLower().Contains(value.ToLower())
+                                                                  ||a.Id.ToString().ToLower().Contains(value.ToLower())
+                                                                  ||a.ZipCode.ToString().ToLower().Contains(value.ToLower())
+                                                                  ||a.Country.ToLower().Contains(value.ToLower())
+                                                                  ||a.City.ToLower().Contains(value.ToLower())
+                                                                  ||a.Street.ToLower().Contains(value.ToLower())).ToListAsync());
+
+               /* return Ok(await this._appDbContext.Addresses
+                    . Where(a => Array.IndexOf(a.GetType().GetProperties(),value)>-1)
+                    .ToListAsync()); */
+
+           
         }
 
     }
