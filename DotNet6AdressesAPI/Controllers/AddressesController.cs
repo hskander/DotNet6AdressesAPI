@@ -3,6 +3,8 @@ using DotNet6AdressesAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Any;
+using System.Reflection;
 
 namespace DotNet6AdressesAPI.Controllers
 {
@@ -81,6 +83,47 @@ namespace DotNet6AdressesAPI.Controllers
             return Ok(newAddress);
         }
 
+        [HttpGet("/GetAllAscending")]
+        public async Task<ActionResult<List<Address>>> GetAllAscending()
+        {
+            try
+            {
+                return Ok(await this._appDbContext.Addresses.OrderBy(a => a.HouseNumber).ToListAsync());    
+            }catch(Exception ex)
+            {
+                return BadRequest("Bad Request");
+            }
+        }
+        [HttpGet("/GetAllDescending")]
+        public async Task<ActionResult<List<Address>>> GetAllDescending()
+        {
+            try
+            {
+                return Ok(await this._appDbContext.Addresses.OrderByDescending(a => a.HouseNumber).ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Bad Request");
+            }
+        }
+
+        [HttpGet("/Search/{value}")]
+        public async Task<ActionResult<List<Address>>> Search(string value)
+        {
+            try
+            {
+                return Ok(await this._appDbContext.Addresses.Where(a => a.HouseNumber.ToString().ToLower().Contains(value.ToLower())
+                                                                 ||a.Id.ToString().ToLower().Contains(value.ToLower())
+                                                                 ||a.ZipCode.ToString().ToLower().Contains(value.ToLower())
+                                                                 ||a.Country.ToLower().Contains(value.ToLower())
+                                                                 ||a.City.ToLower().Contains(value.ToLower())
+                                                                 ||a.Street.ToLower().Contains(value.ToLower())).ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Bad Request");
+            }
+        }
 
     }
 }
