@@ -1,10 +1,11 @@
 ﻿using DotNet6AdressesAPI.Data;
 using DotNet6AdressesAPI.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Any;
-using System.Reflection;
+using GoogleMaps.LocationServices;
+using System.Net;
+using Geolocation;
+using System.Reflection.Metadata.Ecma335;
 
 namespace DotNet6AdressesAPI.Controllers
 {
@@ -108,12 +109,6 @@ namespace DotNet6AdressesAPI.Controllers
 
         }
 
-        /*[HttpGet("test")]
-        public async Task<ActionResult<List<Address>>> getTest()
-        {
-            Address a=new Address();
-            return Ok( a.GetType().GetProperties().ToList() ) ;
-        }*/
 
         [HttpGet("/Search/{value}")]
         public async Task<ActionResult<List<Address>>> Search(string value)
@@ -125,13 +120,33 @@ namespace DotNet6AdressesAPI.Controllers
                                                                   ||a.Country.ToLower().Contains(value.ToLower())
                                                                   ||a.City.ToLower().Contains(value.ToLower())
                                                                   ||a.Street.ToLower().Contains(value.ToLower())).ToListAsync());
-
-               /* return Ok(await this._appDbContext.Addresses
-                    . Where(a => Array.IndexOf(a.GetType().GetProperties(),value)>-1)
-                    .ToListAsync()); */
-
-           
         }
 
+        [HttpGet("/Search/{address1Id}/{address2Id}")]
+        public async Task<ActionResult<float>> DistanceBetweenAddresses(int address1Id, int address2Id)
+        {
+            var gls = new GoogleLocationService();
+           // var address1 = await this._appDbContext.Addresses.FindAsync(address1Id);
+            //var address2 = await this._appDbContext.Addresses.FindAsync(address2Id);
+            try
+            {
+                // var latlong = gls.GetLatLongFromAddress(address1.City);
+                //var Latitude = latlong.Latitude;
+                //var Longitude = latlong.Longitude;
+                // System.Console.WriteLine("Address ({0}) is at {1},{2}", address1, Latitude, Longitude);
+                //var latlong2 = gls.GetLatLongFromAddress(address2.City);
+                //var Latitude2 = latlong.Latitude;
+                //var Longitude2 = latlong.Longitude;
+                //System.Console.WriteLine("Address ({0}) is at {1},{2}", address1, Latitude, Longitude);
+                double distance = GeoCalculator.GetDistance(48.8566, -2.3522, 45.7640, -4.8357, 1);
+                return Ok(distance* 1.60934);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Bad Request");
+            }
+
+        }
+        
     }
 }
