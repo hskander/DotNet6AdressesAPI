@@ -23,7 +23,7 @@ orjust use it as a api, deployed locally or publish on some server and use some 
 4. And now you can test the APIs with Swagger
 
 ## Testing the APIs
-* Post Method AddAdress(Address newAddress), you don't need to add the primary key value, it will be generated auto
+* Post Method AddAdress(Address newAddress), you don't need to add the primary key value, it will be generated auto, note that all field are required!
 * Get Method GetAllAddresses(), this method return all the addresses in the data base
 * Put Method EditAddress(Address newAddress), you add an address response body with an id of the address you wanna edit, if the address exist their fields will be updated with the new Address
 * GetById Method GetAddressById(int id), this method will find and return the address by id if it is exist in the data base
