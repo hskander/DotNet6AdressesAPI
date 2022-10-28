@@ -175,7 +175,8 @@ namespace DotNet6AdressesAPI.Controllers
         public async Task<ActionResult<float>> distanceBetweenTostaticCoordinates()
         {
             double distance = GeoCalculator.GetDistance(52.0907, -5.1214, 48.8566, -2.3522, 1);
-            return Ok(distance * 1.60934 +"KM");
+            
+            return Ok( (distance * 1.60934 +"KM"));
         }
 
     }
