@@ -35,7 +35,6 @@ orjust use it as a api, deployed locally or publish on some server and use some 
            know the distance between them if the 2 addresses are not null, then i used the package [GoogleMaps.LocationServices](https://www.nuget.org/packages/GoogleMaps.LocationServices) and  that suposed to give me the coordinates of each address, then when i have the coordinates 
            the package GeoLocation (https://www.nuget.org/packages/Geolocation) calculate the distance between them 
            issue: the package Geolocation work successfuly, but GoogleMaps.LocationServices doesen't work so i make this method as a comment and add it to my to do list
-         
          - I tried to find a way to sort the Addresses dynamically, so that if an address attribut was added, I don't have to add extra code for sorting, by getting the field name as a parameter and then sort addresses by that parameter but I couldn't find a way to convert a string to an instance attribute
 
 ## Parts I am proud of
