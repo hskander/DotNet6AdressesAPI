@@ -11,6 +11,7 @@ using Geocoding;
 using Address = DotNet6AdressesAPI.Models.Address;
 using Velyo.Google.Services.Models;
 using Velyo.Google.Services;
+using DotNet6AdressesAPI.Services;
 
 namespace DotNet6AdressesAPI.Controllers
 {
@@ -18,99 +19,82 @@ namespace DotNet6AdressesAPI.Controllers
     [ApiController]
     public class AddressesController : ControllerBase
     {
-        private readonly AppDbContext _appDbContext;
-        public AddressesController(AppDbContext context)
+        private readonly IAddressService _addressService;
+        public AddressesController(IAddressService services)
         {
-            this._appDbContext = context;
+            _addressService = services;
         }
 
         [HttpPost]
         public async Task<ActionResult<List<Address>>> AddAddress(Address address)
         {
-            this._appDbContext.Add(address);
-            await this._appDbContext.SaveChangesAsync();
-
-            return Ok(await this._appDbContext.Addresses.ToListAsync());
+            try{
+                return Ok(await _addressService.AddAddress(address));
+            }
+            catch
+            {
+                return BadRequest("Request Error");
+            }
+            
         }
 
         [HttpGet]
         public async Task<ActionResult<List<Address>>> GetAllAddresses()
         {
-            return Ok(await this._appDbContext.Addresses.ToListAsync());
+            try
+            {
+                return Ok(await _addressService.GetAllAddresses());
+            }
+            catch
+            {
+                return BadRequest("Request Error");
+            }
+            
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Address>> GetAddressById(int id)
         {
-            var address = await this._appDbContext.Addresses.FindAsync(id);
+            var address = _addressService.GetAddressById(id);
             if (address == null)
             {
                 return BadRequest("Address Not Found.");
             }
-            return Ok(address);
+            return Ok(await address);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<List<Address>>> DeleteAddressById(int id)
         {
-            var address = await this._appDbContext.Addresses.FindAsync(id);
-            if (address == null)
+            try
             {
-                return BadRequest("Address Not Found.");
+                return Ok(await _addressService.DeleteAddressById(id));
             }
-            else
+            catch
             {
-                 this._appDbContext.Addresses.Remove(address);
-                await this._appDbContext.SaveChangesAsync();
-
+                return BadRequest("Request Error");
             }
-            return Ok(await this._appDbContext.Addresses.ToListAsync());
+            
         }
 
         [HttpPut]
         public async Task<ActionResult<Address>> EditAddress(Address newAddress)
         {
-            var address = await this._appDbContext.Addresses.FindAsync(newAddress.Id);
-            if (address == null)
-            {
-                return BadRequest("Address with Id= "+ newAddress.Id +" Not Found.");
-            }
-            else
-            {
-                address.Street= newAddress.Street;
-                address.City= newAddress.City;
-                address.HouseNumber= newAddress.HouseNumber;
-                address.ZipCode= newAddress.ZipCode;
-                address.Country= newAddress.Country;
-                this._appDbContext.Addresses.Update(address);
-                await this._appDbContext.SaveChangesAsync();
-
-            }
-            return Ok(newAddress);
+            var address = _addressService.EditAddress(newAddress);
+            return Ok(await address);
         }
 
         [HttpGet("/Sort/{AscOrDesc}")]
-        public async Task<ActionResult<List<Address>>> GetAllAscending(string AscOrDesc)
+        public async Task<ActionResult<List<Address>>> GetAllSorted(string AscOrDesc)
         {
-            if(AscOrDesc == "Desc")
-            {
                 try
                 {
-                    return Ok(await this._appDbContext.Addresses.OrderByDescending(a => a.HouseNumber).ToListAsync());
+                 return await this._addressService.GetAllSorted(AscOrDesc);
                 }
                 catch (Exception ex)
                 {
                     return BadRequest("Bad Request");
                 }
-            }
-            try
-            {
-                return Ok(await this._appDbContext.Addresses.OrderBy(a => a.HouseNumber).ToListAsync());
-            }
-            catch (Exception ex)
-            {
-                return BadRequest("Bad Request");
-            }
 
         }
 
@@ -118,13 +102,15 @@ namespace DotNet6AdressesAPI.Controllers
         [HttpGet("/Search")]
         public async Task<ActionResult<List<Address>>> Search(string value)
         {
-           
-                 return Ok(await this._appDbContext.Addresses.Where(a => a.HouseNumber.ToString().ToLower().Contains(value.ToLower())
-                                                                  ||a.Id.ToString().ToLower().Contains(value.ToLower())
-                                                                  ||a.ZipCode.ToString().ToLower().Contains(value.ToLower())
-                                                                  ||a.Country.ToLower().Contains(value.ToLower())
-                                                                  ||a.City.ToLower().Contains(value.ToLower())
-                                                                  ||a.Street.ToLower().Contains(value.ToLower())).ToListAsync());
+            try
+            {
+               return Ok(await _addressService.Search(value));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Bad Request");
+            }
+            
         }
         //in this method i tried to pass 2 parameters in the request for the first and the second address that i want to
         //know the distance between them if the 2 addresses are not null, then i used the package
